@@ -10,6 +10,7 @@ abstract final class AppColors {
   static const divider = Color(0xFF2A3542);
   static const text = Color(0xFFE8EDF2);
   static const muted = Color(0xFF93A1B0);
-  static const accent = Color(0xFF4FC3F7);
-  static const progress = Color(0xFF66BB6A);
+  /// Rojo para acentos y barras; el agua del mapa sigue siendo azul casi negro.
+  static const accent = Color(0xFFFF5252);
+  static const progress = Color(0xFFE53935);
 }

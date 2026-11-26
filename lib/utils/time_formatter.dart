@@ -33,5 +33,9 @@ class TimezoneLabel {
   static String clock(DateTime value) =>
       '${_two(value.hour)}:${_two(value.minute)}:${_two(value.second)}';
 
+  /// GMT en el mapa: sin segundos para no engordar la superposición.
+  static String shortClock(DateTime value) =>
+      '${_two(value.hour)}:${_two(value.minute)}';
+
   static String _two(int value) => value.toString().padLeft(2, '0');
 }

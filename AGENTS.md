@@ -23,8 +23,8 @@ para alarmas y un tercio para el mapamundi día/noche con relojes GMT y local.
 - Hablar en español; código e identificadores en inglés.
 - Paquetes y canales nativos con prefijo `eu.elarreglador`.
 - La lógica de fechas va en `domain/services`, nunca en widgets.
-- La barra regresiva mide el tiempo restante sobre una ventana de 7 días:
-  más larga = falta más; se vacía al sonar.
+- La barra regresiva tiene 24 celdas de una hora: se apagan de derecha a
+  izquierda; si falta más de un día, queda llena. Se vacía al sonar.
 - No exponer secretos. `SENSIBLE/` queda ignorado por git.
 - No hacer commits ni pushes sin petición explícita.
 

@@ -39,5 +39,15 @@ Checklist del proyecto **Great Alarm**.
 - [x] El anillo polar se cierra por el borde del polo (no con una cuerda), evitando el corte en dos partes del mapa.
 - [x] Sombra nocturna semitransparente para que se adivinen los continentes debajo.
 - [x] Recorte sur de la proyección (unos km al sur de Tierra del Fuego): se oculta la Antártida y desaparece la costura del antimeridiano.
+- [x] GMT reducido y superpuesto a la imagen del mapa; hora local digital, roja, alineada a la derecha y con segundos.
+- [x] Mapa a 2/3 de la altura del panel derecho, con el tercio inferior libre para otro widget.
+- [x] Acentos y barras en rojo; el agua del mapa conserva su azul casi negro.
+- [x] Botón (+) flotante sobre la lista, centrado en su parte inferior.
+- [x] Eliminado el título «Mis alarmas»; la hora local ocupa sola la cabecera.
+- [x] Altura del mapa reducida a la mitad del panel, con hueco inferior libre.
+- [x] GMT sin segundos.
+- [x] Botón de lápiz en cada alarma que abre el formulario con sus valores actuales.
+- [x] Barra de progreso de 24 celdas horarias con separación vertical.
+- [x] Tarjetas compactadas: controles en horizontal y cuenta atrás junto a la barra.
 - [x] Resguardo a la derecha del reloj local para que no lo tape el botón (+).
 - [x] `AGENTS.md` documenta cómo lanzar la app por USB y los problemas de MIUI.

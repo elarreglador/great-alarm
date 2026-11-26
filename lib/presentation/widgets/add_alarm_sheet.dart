@@ -3,14 +3,25 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/alarm.dart';
 import '../../utils/app_colors.dart';
 
-/// Formulario flotante del botón (+): hora, días y tipo de alarma.
+/// Formulario flotante del botón (+) y del lápiz de edición.
 class AddAlarmSheet extends StatefulWidget {
   final int id;
   final DateTime now;
+  final Alarm? alarm;
 
-  const AddAlarmSheet({super.key, required this.id, required this.now});
+  const AddAlarmSheet({
+    super.key,
+    required this.id,
+    required this.now,
+    this.alarm,
+  });
 
-  static Future<Alarm?> show(BuildContext context, int id, DateTime now) {
+  static Future<Alarm?> show(
+    BuildContext context,
+    int id,
+    DateTime now, {
+    Alarm? alarm,
+  }) {
     return showModalBottomSheet<Alarm>(
       context: context,
       isScrollControlled: true,
@@ -18,7 +29,7 @@ class AddAlarmSheet extends StatefulWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => AddAlarmSheet(id: id, now: now),
+      builder: (_) => AddAlarmSheet(id: id, now: now, alarm: alarm),
     );
   }
 
@@ -46,10 +57,15 @@ class _AddAlarmSheetState extends State<AddAlarmSheet> {
   @override
   void initState() {
     super.initState();
-    _time = TimeOfDay.fromDateTime(widget.now);
-    _date = DateTime(widget.now.year, widget.now.month, widget.now.day);
-    _repeats = true;
-    _weekdays.addAll({1, 2, 3, 4, 5});
+    final alarm = widget.alarm;
+    _labelController.text = alarm?.label ?? 'Nueva alarma';
+    _time = alarm == null
+        ? TimeOfDay.fromDateTime(widget.now)
+        : TimeOfDay(hour: alarm.hour, minute: alarm.minute);
+    _date = alarm?.date ??
+        DateTime(widget.now.year, widget.now.month, widget.now.day);
+    _repeats = alarm?.isRepeating ?? true;
+    _weekdays.addAll(alarm?.weekdays ?? <int>{1, 2, 3, 4, 5});
   }
 
   @override
@@ -94,6 +110,7 @@ class _AddAlarmSheetState extends State<AddAlarmSheet> {
         minute: _time.minute,
         weekdays: _repeats ? Set<int>.from(_weekdays) : const <int>{},
         date: _repeats ? null : _date,
+        enabled: widget.alarm?.enabled ?? true,
       ),
     );
   }
@@ -112,9 +129,9 @@ class _AddAlarmSheetState extends State<AddAlarmSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Nueva alarma',
-              style: TextStyle(color: AppColors.text, fontSize: 20),
+            Text(
+              widget.alarm == null ? 'Nueva alarma' : 'Editar alarma',
+              style: const TextStyle(color: AppColors.text, fontSize: 20),
             ),
             const SizedBox(height: 12),
             TextField(

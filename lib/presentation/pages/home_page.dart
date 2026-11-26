@@ -9,7 +9,6 @@ import '../../data/services/alarm_notification_scheduler.dart';
 import '../../data/services/device_timezone_service.dart';
 import '../../domain/entities/alarm.dart';
 import '../../utils/app_colors.dart';
-import '../../utils/time_formatter.dart';
 import '../widgets/add_alarm_sheet.dart';
 import '../widgets/alarm_panel.dart';
 import '../widgets/world_map_panel.dart';
@@ -32,7 +31,6 @@ class _HomePageState extends State<HomePage> {
   Timer? _ticker;
   List<Alarm> _alarms = const <Alarm>[];
   LandGeometry? _land;
-  String _timezoneId = 'UTC';
   bool _ready = false;
 
   @override
@@ -64,7 +62,6 @@ class _HomePageState extends State<HomePage> {
 
     if (!mounted) return;
     setState(() {
-      _timezoneId = timezoneId;
       _land = land;
       _alarms = alarms;
       _ready = true;
@@ -106,6 +103,22 @@ class _HomePageState extends State<HomePage> {
     await _persist();
   }
 
+  Future<void> _editAlarm(Alarm alarm) async {
+    final edited = await AddAlarmSheet.show(
+      context,
+      alarm.id,
+      _clock.value,
+      alarm: alarm,
+    );
+    if (edited == null) return;
+    setState(() {
+      _alarms = _alarms
+          .map((a) => a.id == edited.id ? edited : a)
+          .toList();
+    });
+    await _persist();
+  }
+
   Future<void> _toggle(Alarm alarm) async {
     setState(() {
       _alarms = _alarms
@@ -124,11 +137,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.water,
-      floatingActionButton: FloatingActionButton(
-        onPressed: _ready ? _addAlarm : null,
-        backgroundColor: AppColors.accent,
-        child: const Icon(Icons.add),
-      ),
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -141,7 +149,9 @@ class _HomePageState extends State<HomePage> {
                   alarms: _alarms,
                   now: now,
                   onToggle: _toggle,
+                  onEdit: _editAlarm,
                   onDelete: _delete,
+                  onAdd: _ready ? _addAlarm : () {},
                 ),
               ),
             ),
@@ -153,7 +163,6 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, now, _) => WorldMapPanel(
                   land: _land,
                   now: now,
-                  localLabel: TimezoneLabel.fromTimezoneId(_timezoneId),
                 ),
               ),
             ),

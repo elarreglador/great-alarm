@@ -21,6 +21,7 @@ void main() {
             alarm: alarm,
             now: now,
             onEnabledChanged: (_) {},
+            onEdit: () {},
             onDelete: () {},
           ),
         ),

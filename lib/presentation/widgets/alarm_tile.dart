@@ -4,10 +4,12 @@ import '../../domain/entities/alarm.dart';
 import '../../domain/services/alarm_calculator.dart';
 import '../../utils/app_colors.dart';
 
+/// Tarjeta compacta: dos renglones y controles en horizontal.
 class AlarmTile extends StatelessWidget {
   final Alarm alarm;
   final DateTime now;
   final ValueChanged<bool> onEnabledChanged;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   const AlarmTile({
@@ -15,68 +17,77 @@ class AlarmTile extends StatelessWidget {
     required this.alarm,
     required this.now,
     required this.onEnabledChanged,
+    required this.onEdit,
     required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     final next = AlarmCalculator.nextOccurrence(alarm, now);
-    final remaining = AlarmCalculator.remainingFraction(next, now);
-    final countdown = AlarmCalculator.formatRemaining(next, now);
+    final hoursLeft = (next?.difference(now).inHours ?? 0).clamp(0, 24);
 
     return Opacity(
       opacity: alarm.enabled ? 1.0 : 0.45,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 5),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: AppColors.panel,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.divider),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    alarm.label,
-                    style: const TextStyle(
-                      color: AppColors.text,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          alarm.label,
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        '${_two(alarm.hour)}:${_two(alarm.minute)}  '
+                        '${alarm.daysLabel}',
+                        style: const TextStyle(
+                          color: AppColors.accent,
+                          fontSize: 14,
+                          fontFeatures: <FontFeature>[
+                            FontFeature.tabularFigures(),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
-                    '${_two(alarm.hour)}:${_two(alarm.minute)}  '
-                    '${alarm.daysLabel}',
-                    style: const TextStyle(
-                      color: AppColors.accent,
-                      fontSize: 15,
-                      fontFeatures: <FontFeature>[
-                        FontFeature.tabularFigures(),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'sonará en $countdown',
+                    'sonará en ${AlarmCalculator.formatRemaining(next, now)}',
                     style: const TextStyle(
                       color: AppColors.muted,
-                      fontSize: 13,
+                      fontSize: 12,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  _CountdownBar(fraction: remaining),
+                  const SizedBox(height: 4),
+                  SizedBox(
+                    width: double.infinity,
+                    child: _HourBar(hoursLeft: hoursLeft),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Column(
+            const SizedBox(width: 6),
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Switch(
@@ -85,10 +96,24 @@ class AlarmTile extends StatelessWidget {
                   activeThumbColor: AppColors.progress,
                 ),
                 IconButton(
+                  tooltip: 'Editar alarma',
+                  icon: const Icon(Icons.edit_outlined, size: 19),
+                  color: AppColors.muted,
+                  onPressed: onEdit,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 36,
+                    height: 36,
+                  ),
+                ),
+                IconButton(
                   tooltip: 'Borrar alarma',
-                  icon: const Icon(Icons.delete_outline, size: 20),
+                  icon: const Icon(Icons.delete_outline, size: 19),
                   color: AppColors.muted,
                   onPressed: onDelete,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 36,
+                    height: 36,
+                  ),
                 ),
               ],
             ),
@@ -101,23 +126,28 @@ class AlarmTile extends StatelessWidget {
   static String _two(int value) => value.toString().padLeft(2, '0');
 }
 
-class _CountdownBar extends StatelessWidget {
-  final double fraction;
+/// Barra de 24 celdas de una hora: se apagan de derecha a izquierda hasta que
+/// la última se apaga y suena la alarma. Si falta más de un día, está llena.
+class _HourBar extends StatelessWidget {
+  final int hoursLeft;
 
-  const _CountdownBar({required this.fraction});
+  const _HourBar({required this.hoursLeft});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: Container(
-        height: 8,
-        color: AppColors.divider,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          widthFactor: fraction,
-          child: Container(color: AppColors.progress),
-        ),
+    return Semantics(
+      label: 'Quedan $hoursLeft horas como máximo en la barra',
+      child: Row(
+        spacing: 2,
+        children: List<Widget>.generate(24, (index) {
+          final lit = index < hoursLeft;
+          return Expanded(
+            child: Container(
+              height: 8,
+              color: lit ? AppColors.progress : AppColors.divider,
+            ),
+          );
+        }),
       ),
     );
   }
