@@ -8,6 +8,7 @@ import '../../data/repositories/alarm_repository.dart';
 import '../../data/services/alarm_notification_scheduler.dart';
 import '../../data/services/device_timezone_service.dart';
 import '../../domain/entities/alarm.dart';
+import '../../domain/services/alarm_calculator.dart';
 import '../../utils/app_colors.dart';
 import '../widgets/add_alarm_sheet.dart';
 import '../widgets/alarm_panel.dart';
@@ -146,7 +147,7 @@ class _HomePageState extends State<HomePage> {
               child: ValueListenableBuilder<DateTime>(
                 valueListenable: _clock,
                 builder: (context, now, _) => AlarmPanel(
-                  alarms: _alarms,
+                  alarms: AlarmCalculator.sortByNext(_alarms, now),
                   now: now,
                   onToggle: _toggle,
                   onEdit: _editAlarm,

@@ -24,7 +24,11 @@ class AlarmTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final next = AlarmCalculator.nextOccurrence(alarm, now);
-    final hoursLeft = (next?.difference(now).inHours ?? 0).clamp(0, 24);
+    final remaining = next?.difference(now) ?? Duration.zero;
+    final hoursLeft = remaining <= Duration.zero
+        ? 0
+        // Cualquier tiempo positivo enciende al menos una celda.
+        : ((remaining.inMinutes + 59) ~/ 60).clamp(1, 24);
 
     return Opacity(
       opacity: alarm.enabled ? 1.0 : 0.45,

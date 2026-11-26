@@ -53,6 +53,25 @@ class AlarmCalculator {
     return null;
   }
 
+  /// Alarmas ordenadas por próxima activación: la que antes suena, arriba.
+  ///
+  /// Las que ya no volverán a sonar (un uso vencido) se dejan al final.
+  static List<Alarm> sortByNext(List<Alarm> alarms, DateTime now) {
+    final moments = alarms
+        .map((alarm) => MapEntry<Alarm, DateTime?>(
+              alarm,
+              nextOccurrence(alarm, now),
+            ))
+        .toList();
+    moments.sort((a, b) {
+      if (a.value == null && b.value == null) return 0;
+      if (a.value == null) return 1;
+      if (b.value == null) return -1;
+      return a.value!.compareTo(b.value!);
+    });
+    return moments.map((entry) => entry.key).toList();
+  }
+
   /// Parte llena de la barra: cuánto queda de la semana de ventana.
   static double remainingFraction(DateTime? next, DateTime now) {
     if (next == null) return 0;

@@ -37,7 +37,7 @@ La zona izquierda —los dos tercios— es la lista de tus despertadores. Cada a
 - **La hora y la fecha de la próxima vez que sonará.** Nada de «dentro de 7 horas» que te obliga a hacer cálculos mentales con el café aún sin servir. Te dice, por ejemplo, «sábado 14 de marzo, 06:30».
 - **Una barra de 24 horas partida en celdas de una hora.** Cada rayita vertical separa una hora. Las celdas se apagan de derecha a izquierda a medida que pasa el tiempo; cuando se apaga la última, suena la alarma. Si todavía falta más de un día, las 24 celdas siguen encendidas y la cuenta atrás escrita indica los días. Es una forma de ver el último tramo sin necesidad de abrir la alarma ni mirar el reloj del móvil.
 
-Puedes tener tantas alarmas como necesites: una para los días laborables, otra para el fin de semana, la del vuelo, la del turno de noche… La lista se actualiza sola y siempre muestra la próxima activación de cada una.
+Puedes tener tantas alarmas como necesites: una para los días laborables, otra para el fin de semana, la del vuelo, la del turno de noche… La lista se ordena sola: la que antes va a sonar está arriba y la más lejana, abajo del todo. Así, la primera tarjeta es siempre la que importa ahora mismo.
 
 ### A la derecha: el mundo, en colores (un tercio)
 

@@ -48,6 +48,7 @@ Checklist del proyecto **Great Alarm**.
 - [x] GMT sin segundos.
 - [x] Botón de lápiz en cada alarma que abre el formulario con sus valores actuales.
 - [x] Barra de progreso de 24 celdas horarias con separación vertical.
-- [x] Tarjetas compactadas: controles en horizontal y cuenta atrás junto a la barra.
+- [x] Tarjetas compactadas: controles en horizontal, cuenta atrás y barra en líneas propias.
+- [x] Lista ordenada por próxima activación: la que antes suena arriba y la más lejana abajo.
 - [x] Resguardo a la derecha del reloj local para que no lo tape el botón (+).
 - [x] `AGENTS.md` documenta cómo lanzar la app por USB y los problemas de MIUI.

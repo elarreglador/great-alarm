@@ -63,6 +63,14 @@ void main() {
     expect(AlarmCalculator.remainingFraction(null, now), 0);
   });
 
+  test('la lista se ordena por próxima activación', () {
+    final sorted = AlarmCalculator.sortByNext(
+      <Alarm>[weekend, weekdays],
+      now,
+    );
+    expect(sorted.map((a) => a.id), <int>[1, 2]);
+  });
+
   test('una alarma de un solo uso vencida no tiene próxima activación', () {
     final once = Alarm(
       id: 3,
