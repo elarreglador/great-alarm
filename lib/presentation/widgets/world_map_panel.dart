@@ -31,11 +31,10 @@ class WorldMapPanel extends StatelessWidget {
                   child: CircularProgressIndicator(color: AppColors.accent),
                 )
               : Center(
-                  // El mundo es 2:1. Sin esta proporción, un panel alto y
-                  // estrecho estira los continentes y Antarctica se come
-                  // media pantalla.
+                  // Proporción del mundo recortado al sur de Tierra del Fuego.
+                  // Sin esto, un panel alto y estrecho estira los continentes.
                   child: AspectRatio(
-                    aspectRatio: 2.0,
+                    aspectRatio: WorldMapPainter.aspectRatio,
                     child: CustomPaint(
                       painter: WorldMapPainter(land: land!, night: night),
                       size: Size.infinite,

@@ -38,5 +38,6 @@ Checklist del proyecto **Great Alarm**.
 - [x] Eliminadas las diagonales desde las esquinas al sur de América: el anillo de la Antártida ahora se desbobina en el antimeridiano y se recorta al lienzo.
 - [x] El anillo polar se cierra por el borde del polo (no con una cuerda), evitando el corte en dos partes del mapa.
 - [x] Sombra nocturna semitransparente para que se adivinen los continentes debajo.
+- [x] Recorte sur de la proyección (unos km al sur de Tierra del Fuego): se oculta la Antártida y desaparece la costura del antimeridiano.
 - [x] Resguardo a la derecha del reloj local para que no lo tape el botón (+).
 - [x] `AGENTS.md` documenta cómo lanzar la app por USB y los problemas de MIUI.

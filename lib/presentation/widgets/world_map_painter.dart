@@ -16,14 +16,27 @@ class WorldMapPainter extends CustomPainter {
 
   const WorldMapPainter({required this.land, required this.night});
 
+  /// Corte sur: unos kilómetros al sur de Tierra del Fuego. La Antártida no
+  /// se dibuja, con lo que desaparece su costura en el antimeridiano.
   static const double _maxLat = 85.05112878;
+  static const double _minLat = -56.0;
+
+  static double _mercatorY(double latitudeDeg) {
+    final lat = latitudeDeg.clamp(_minLat, _maxLat) * math.pi / 180.0;
+    return math.log((1 + math.sin(lat)) / (1 - math.sin(lat)));
+  }
+
+  static final double _bottom = 0.5 - _mercatorY(_minLat) / (4 * math.pi);
+
+  /// Proporción del mundo recortado: ancho 360° / alto recortado.
+  static double get aspectRatio => 1 / _bottom;
 
   static Offset project(GeoPoint point, Size size) {
-    final lat = point.latitude.clamp(-_maxLat, _maxLat) * math.pi / 180.0;
+    final lat = point.latitude.clamp(_minLat, _maxLat) * math.pi / 180.0;
     final mercatorY = math.log((1 + math.sin(lat)) / (1 - math.sin(lat)));
     return Offset(
       (point.longitude + 180.0) / 360.0 * size.width,
-      (0.5 - mercatorY / (4 * math.pi)) * size.height,
+      (0.5 - mercatorY / (4 * math.pi)) / _bottom * size.height,
     );
   }
 
@@ -62,8 +75,9 @@ class WorldMapPainter extends CustomPainter {
   /// Dibuja el mismo contorno en las tres vueltas del mundo para que cloques
   /// lo que quede a un lado del antimeridiano aparezca por el otro.
   void _drawWrapped(Canvas canvas, Path path, Paint paint, double width) {
-    // Un píxel de solape evita la costura antiparalela entre copias.
-    for (final shift in <double>[-width + 1, 0, width - 1]) {
+    // Solape de varios píxeles: con pantalla de alta densidad, un solo píxel
+    // lógico no cubre el antialiasing de la costura entre copias.
+    for (final shift in <double>[-width + 4, 0, width - 4]) {
       canvas.save();
       canvas.translate(shift, 0);
       canvas.drawPath(path, paint);
@@ -102,7 +116,7 @@ class WorldMapPainter extends CustomPainter {
     if (wrapped) {
       final meanLat = points.map((p) => p.latitude).reduce((a, b) => a + b) /
           points.length;
-      final poleLat = meanLat < 0 ? -_maxLat : _maxLat;
+      final poleLat = meanLat < 0 ? _minLat : _maxLat;
       final firstLongitude = points.first.longitude;
       final steps = ((previous - firstLongitude).abs() / 5).round();
       for (var i = 1; i <= steps; i++) {
