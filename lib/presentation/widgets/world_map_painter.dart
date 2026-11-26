@@ -34,43 +34,84 @@ class WorldMapPainter extends CustomPainter {
       Paint()..color = AppColors.water,
     );
 
+    // Los anillos que cruzan el antimeridiano se desbobinan a longitudes
+    // continuas y se recortan al lienzo. Partir el trazo en el salto cerraba
+    // el polígono a escondidas y dibujaba diagonales desde las esquinas.
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+
     final landPaint = Paint()
       ..color = AppColors.land
       ..style = PaintingStyle.fill;
     for (final ring in land.rings) {
-      canvas.drawPath(_buildPath(ring, size), landPaint);
+      _drawWrapped(canvas, _buildPath(ring, size), landPaint, size.width);
     }
 
     if (night.isNotEmpty) {
-      canvas.drawPath(
+      _drawWrapped(
+        canvas,
         _buildPath(night, size),
         Paint()..color = AppColors.night..style = PaintingStyle.fill,
+        size.width,
       );
+    }
+
+    canvas.restore();
+  }
+
+  /// Dibuja el mismo contorno en las tres vueltas del mundo para que cloques
+  /// lo que quede a un lado del antimeridiano aparezca por el otro.
+  void _drawWrapped(Canvas canvas, Path path, Paint paint, double width) {
+    // Un píxel de solape evita la costura antiparalela entre copias.
+    for (final shift in <double>[-width + 1, 0, width - 1]) {
+      canvas.save();
+      canvas.translate(shift, 0);
+      canvas.drawPath(path, paint);
+      canvas.restore();
     }
   }
 
-  /// Rompe el trazo cuando la longitud salta más de 180° (antimeridiano),
-  /// evitando la clásica raya diagonal de un polo al otro.
+  /// Construye el trazo con longitudes continuas (sin saltos de 360°).
+  ///
+  /// Los anillos polares que dan la vuelta al mundo no se cierran con una
+  /// cuerda entre costa y costa: bajan (o suben) por el borde del polo, que es
+  /// lo que evita la línea recta que partía el mapa en dos.
   Path _buildPath(List<GeoPoint> points, Size size) {
     final path = Path();
     if (points.isEmpty) return path;
 
-    var previous = points.first;
-    var current = project(previous, size);
+    var shift = 0.0;
+    var wrapped = false;
+    var previous = points.first.longitude;
+    var current = project(GeoPoint(points.first.latitude, previous), size);
     path.moveTo(current.dx, current.dy);
 
     for (var i = 1; i < points.length; i++) {
       final point = points[i];
-      if ((point.longitude - previous.longitude).abs() > 180) {
-        path.close();
-        current = project(point, size);
-        path.moveTo(current.dx, current.dy);
-      } else {
-        current = project(point, size);
+      var longitude = point.longitude + shift;
+      if ((longitude - previous).abs() > 180) {
+        wrapped = true;
+        shift += longitude > previous ? -360 : 360;
+        longitude = point.longitude + shift;
+      }
+      current = project(GeoPoint(point.latitude, longitude), size);
+      path.lineTo(current.dx, current.dy);
+      previous = longitude;
+    }
+
+    if (wrapped) {
+      final meanLat = points.map((p) => p.latitude).reduce((a, b) => a + b) /
+          points.length;
+      final poleLat = meanLat < 0 ? -_maxLat : _maxLat;
+      final firstLongitude = points.first.longitude;
+      final steps = ((previous - firstLongitude).abs() / 5).round();
+      for (var i = 1; i <= steps; i++) {
+        final longitude = previous + (firstLongitude - previous) * i / steps;
+        current = project(GeoPoint(poleLat, longitude), size);
         path.lineTo(current.dx, current.dy);
       }
-      previous = point;
     }
+
     path.close();
     return path;
   }

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 abstract final class AppColors {
   static const water = Color(0xFF070E18);
   static const land = Color(0xFF8A8A8A);
-  static const night = Color(0xFF000000);
+  /// Negro con transparencia: la tierra sigue adivinándose bajo la noche.
+  static const night = Color(0xA8000000);
   static const panel = Color(0xFF101822);
   static const divider = Color(0xFF2A3542);
   static const text = Color(0xFFE8EDF2);

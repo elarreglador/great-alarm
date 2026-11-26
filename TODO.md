@@ -35,5 +35,8 @@ Checklist del proyecto **Great Alarm**.
 - [x] `flutter analyze` sin incidencias, `flutter test` en verde.
 - [x] APK debug y release compilados correctamente.
 - [x] Corregida la proporción del mapa en pantallas altas (mundo 2:1 centrado).
+- [x] Eliminadas las diagonales desde las esquinas al sur de América: el anillo de la Antártida ahora se desbobina en el antimeridiano y se recorta al lienzo.
+- [x] El anillo polar se cierra por el borde del polo (no con una cuerda), evitando el corte en dos partes del mapa.
+- [x] Sombra nocturna semitransparente para que se adivinen los continentes debajo.
 - [x] Resguardo a la derecha del reloj local para que no lo tape el botón (+).
 - [x] `AGENTS.md` documenta cómo lanzar la app por USB y los problemas de MIUI.
