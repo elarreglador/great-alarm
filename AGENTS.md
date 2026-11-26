@@ -72,6 +72,20 @@ flutter install -d <serial>
 adb shell am start -n eu.elarreglador.great_alarm/.MainActivity
 ```
 
+En móviles MIUI/Xiaomi, `flutter install` instala la APK **release** y puede
+fallar con `INSTALL_FAILED_USER_RESTRICTED: Install canceled by user`. Es una
+protección del fabricante, no un error del proyecto. Dos salidas:
+
+1. Activar «Instalar vía USB» (`Install via USB`) en Opciones de desarrollador
+   y aceptar la advertencia en el teléfono.
+2. Usar directamente la APK de debug, que es la que `flutter run` instala:
+
+   ```bash
+   adb -s <serial> install -r build/app/outputs/flutter-apk/app-debug.apk
+   adb -s <serial> shell am force-stop eu.elarreglador.great_alarm
+   adb -s <serial> shell am start -n eu.elarreglador.great_alarm/.MainActivity
+   ```
+
 Si ADB no ve el móvil: activar «Depuración USB» en Opciones de desarrollador,
 aceptar la huella/PIN del equipo en el teléfono y repetir `adb devices`. Si el
 serial aparece como `unauthorized`, hace falta ese paso de autorización; si no

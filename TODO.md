@@ -19,7 +19,7 @@ Checklist del proyecto **Great Alarm**.
 
 ## Fix
 
-- [ ] Comprobar el sonido de la alarma en un dispositivo físico (no hay ninguno conectado ahora mismo).
+- [ ] Comprobar el sonido de la alarma en un dispositivo físico (pendiente de programar una alarma a pocos segundos).
 - [ ] Revisar el comportamiento de la barra en alarmas de un solo uso ya vencidas.
 - [ ] Verificar el terminador solar en un dispositivo real durante los equinoccios (|declinación| < 0.5°).
 
@@ -34,3 +34,6 @@ Checklist del proyecto **Great Alarm**.
 - [x] Tests unitarios de `AlarmCalculator` y del terminador solar, y test de widget.
 - [x] `flutter analyze` sin incidencias, `flutter test` en verde.
 - [x] APK debug y release compilados correctamente.
+- [x] Corregida la proporción del mapa en pantallas altas (mundo 2:1 centrado).
+- [x] Resguardo a la derecha del reloj local para que no lo tape el botón (+).
+- [x] `AGENTS.md` documenta cómo lanzar la app por USB y los problemas de MIUI.
