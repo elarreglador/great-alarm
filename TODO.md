@@ -50,5 +50,6 @@ Checklist del proyecto **Great Alarm**.
 - [x] Barra de progreso de 24 celdas horarias con separación vertical.
 - [x] Tarjetas compactadas: controles en horizontal, cuenta atrás y barra en líneas propias.
 - [x] Lista ordenada por próxima activación: la que antes suena arriba y la más lejana abajo.
+- [x] Parpadeo del último cuadrado encendido cuando quedan menos de 30 minutos.
 - [x] Resguardo a la derecha del reloj local para que no lo tape el botón (+).
 - [x] `AGENTS.md` documenta cómo lanzar la app por USB y los problemas de MIUI.

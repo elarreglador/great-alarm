@@ -85,7 +85,11 @@ class AlarmTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   SizedBox(
                     width: double.infinity,
-                    child: _HourBar(hoursLeft: hoursLeft),
+                    child: _HourBar(
+                      hoursLeft: hoursLeft,
+                      blinkLast: remaining > Duration.zero &&
+                          remaining < const Duration(minutes: 30),
+                    ),
                   ),
                 ],
               ),
@@ -132,26 +136,77 @@ class AlarmTile extends StatelessWidget {
 
 /// Barra de 24 celdas de una hora: se apagan de derecha a izquierda hasta que
 /// la última se apaga y suena la alarma. Si falta más de un día, está llena.
-class _HourBar extends StatelessWidget {
+///
+/// En el último cuadrado todavía encendido parpadea cuando quedan menos de
+/// 30 minutos, para que el aviso se vea de reojo.
+class _HourBar extends StatefulWidget {
   final int hoursLeft;
+  final bool blinkLast;
 
-  const _HourBar({required this.hoursLeft});
+  const _HourBar({required this.hoursLeft, required this.blinkLast});
+
+  @override
+  State<_HourBar> createState() => _HourBarState();
+}
+
+class _HourBarState extends State<_HourBar> with TickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 550),
+    );
+    if (widget.blinkLast) _controller.repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(covariant _HourBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.blinkLast == oldWidget.blinkLast) return;
+    if (widget.blinkLast) {
+      _controller.repeat(reverse: true);
+    } else {
+      _controller.stop();
+      _controller.value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final blinkingIndex = widget.hoursLeft - 1;
     return Semantics(
-      label: 'Quedan $hoursLeft horas como máximo en la barra',
-      child: Row(
-        spacing: 2,
-        children: List<Widget>.generate(24, (index) {
-          final lit = index < hoursLeft;
-          return Expanded(
-            child: Container(
-              height: 8,
-              color: lit ? AppColors.progress : AppColors.divider,
-            ),
+      label: 'Quedan ${widget.hoursLeft} horas como máximo en la barra',
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          return Row(
+            spacing: 2,
+            children: List<Widget>.generate(24, (index) {
+              final lit = index < widget.hoursLeft;
+              final blinking =
+                  widget.blinkLast && index == blinkingIndex && lit;
+              final color = blinking
+                  ? AppColors.progress.withValues(
+                      alpha: 0.15 + 0.85 * _controller.value,
+                    )
+                  : lit
+                      ? AppColors.progress
+                      : AppColors.divider;
+              return Expanded(
+                child: Container(height: 8, color: color),
+              );
+            }),
           );
-        }),
+        },
       ),
     );
   }
