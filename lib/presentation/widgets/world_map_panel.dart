@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/land_geometry.dart';
+import '../../domain/entities/ringing_state.dart';
 import '../../domain/services/sun_terminator_service.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/time_formatter.dart';
+import 'ringing_panel.dart';
 import 'world_map_painter.dart';
 
 /// Un tercio derecho de la pantalla: mapa día/noche sobre dos tercios de la
@@ -11,11 +13,15 @@ import 'world_map_painter.dart';
 class WorldMapPanel extends StatelessWidget {
   final LandGeometry? land;
   final DateTime now;
+  final RingingState? ringing;
+  final VoidCallback onSilence;
 
   const WorldMapPanel({
     super.key,
     required this.land,
     required this.now,
+    required this.ringing,
+    required this.onSilence,
   });
 
   @override
@@ -52,8 +58,17 @@ class WorldMapPanel extends StatelessWidget {
                   ),
                 ),
         ),
-        // Mitad inferior reservada para un futuro widget.
-        const Expanded(flex: 1, child: SizedBox.shrink()),
+        // Mitad inferior: solo aparece mientras suena una alarma.
+        Expanded(
+          flex: 1,
+          child: ringing == null
+              ? const SizedBox.shrink()
+              : RingingPanel(
+                  ringing: ringing!,
+                  now: now,
+                  onSilence: onSilence,
+                ),
+        ),
       ],
     );
   }

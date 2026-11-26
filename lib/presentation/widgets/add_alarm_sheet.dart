@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/alarm.dart';
+import '../../domain/entities/tone_option.dart';
 import '../../utils/app_colors.dart';
 
 /// Formulario flotante del botón (+) y del lápiz de edición.
@@ -42,6 +43,8 @@ class _AddAlarmSheetState extends State<AddAlarmSheet> {
   late TimeOfDay _time;
   late DateTime _date;
   late bool _repeats;
+  late int? _toneHz;
+  late bool _vibrate;
   final Set<int> _weekdays = <int>{};
 
   static const _dayLetters = <int, String>{
@@ -66,6 +69,9 @@ class _AddAlarmSheetState extends State<AddAlarmSheet> {
         DateTime(widget.now.year, widget.now.month, widget.now.day);
     _repeats = alarm?.isRepeating ?? true;
     _weekdays.addAll(alarm?.weekdays ?? <int>{1, 2, 3, 4, 5});
+    _toneHz = alarm?.toneHz ?? 700;
+    _vibrate = alarm?.vibrate ?? false;
+    if (_toneHz == null) _vibrate = true;
   }
 
   @override
@@ -111,6 +117,8 @@ class _AddAlarmSheetState extends State<AddAlarmSheet> {
         weekdays: _repeats ? Set<int>.from(_weekdays) : const <int>{},
         date: _repeats ? null : _date,
         enabled: widget.alarm?.enabled ?? true,
+        toneHz: _toneHz,
+        vibrate: _vibrate,
       ),
     );
   }
@@ -208,6 +216,60 @@ class _AddAlarmSheetState extends State<AddAlarmSheet> {
                 ),
                 onTap: _pickDate,
               ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                SizedBox(
+                  width: 24,
+                  child: Checkbox(
+                    value: _vibrate,
+                    activeColor: AppColors.accent,
+                    onChanged: (value) => setState(() {
+                      _vibrate = value ?? false;
+                      if (!_vibrate && _toneHz == null) _toneHz = 700;
+                    }),
+                  ),
+                ),
+                const Text(
+                  'Vibrar',
+                  style: TextStyle(color: AppColors.text),
+                ),
+              ],
+            ),
+            DropdownButtonFormField<int?>(
+              key: ValueKey<int?>(_toneHz),
+              initialValue: _toneHz,
+              isExpanded: true,
+              decoration: const InputDecoration(
+                labelText: 'Zumbido',
+                labelStyle: TextStyle(color: AppColors.muted),
+              ),
+              dropdownColor: AppColors.panel,
+              items: <DropdownMenuItem<int?>>[
+                ...toneOptions
+                    .map(
+                      (option) => DropdownMenuItem<int?>(
+                        value: option.hz,
+                        child: Text(
+                          option.label,
+                          style: const TextStyle(color: AppColors.text),
+                        ),
+                      ),
+                    ),
+                if (_vibrate)
+                  DropdownMenuItem<int?>(
+                    value: null,
+                    child: Text(
+                      silentTone.label,
+                      style: const TextStyle(color: AppColors.text),
+                    ),
+                  ),
+              ],
+              onChanged: (value) => setState(() {
+                _toneHz = value;
+                if (value == null) _vibrate = true;
+              }),
+            ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _save,

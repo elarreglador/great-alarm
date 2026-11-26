@@ -51,5 +51,9 @@ Checklist del proyecto **Great Alarm**.
 - [x] Tarjetas compactadas: controles en horizontal, cuenta atrás y barra en líneas propias.
 - [x] Lista ordenada por próxima activación: la que antes suena arriba y la más lejana abajo.
 - [x] Parpadeo del último cuadrado encendido cuando quedan menos de 30 minutos.
+- [x] Zumbido pulsado en bucle con seis frecuencias por alarma (440–1600 Hz).
+- [x] Vibración opcional y alarma «Sin sonido» solo con vibración activa.
+- [x] Silenciado desde notificación, desde la app y desde la pantalla bloqueada.
+- [x] Corte automático a los 5 minutos que cuenta como alarma atendida.
 - [x] Resguardo a la derecha del reloj local para que no lo tape el botón (+).
 - [x] `AGENTS.md` documenta cómo lanzar la app por USB y los problemas de MIUI.

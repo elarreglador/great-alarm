@@ -6,6 +6,9 @@ class AlarmCalculator {
 
   static const Duration window = Duration(days: 7);
 
+  /// Id único por alarma y día, estable entre reinicios.
+  static int notificationKey(int alarmId, int weekday) => alarmId * 10 + weekday;
+
   /// Próxima activación estrictamente posterior a [now], o null si ya pasó.
   static DateTime? nextOccurrence(Alarm alarm, DateTime now) {
     if (!alarm.isRepeating) {

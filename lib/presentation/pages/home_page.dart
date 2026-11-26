@@ -5,9 +5,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../data/models/land_geometry.dart';
 import '../../data/repositories/alarm_repository.dart';
-import '../../data/services/alarm_notification_scheduler.dart';
-import '../../data/services/device_timezone_service.dart';
+import '../../data/services/alarm_permission_service.dart';
+import '../../data/services/native_alarm_scheduler.dart';
 import '../../domain/entities/alarm.dart';
+import '../../domain/entities/ringing_state.dart';
 import '../../domain/services/alarm_calculator.dart';
 import '../../utils/app_colors.dart';
 import '../widgets/add_alarm_sheet.dart';
@@ -25,22 +26,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _clock = ValueNotifier<DateTime>(DateTime.now());
   final _repository = const AlarmRepository();
-  final _scheduler = AlarmNotificationScheduler(
-    FlutterLocalNotificationsPlugin(),
-  );
+  final _permissions = AlarmPermissionService(FlutterLocalNotificationsPlugin());
+  final _native = const NativeAlarmScheduler();
 
   Timer? _ticker;
   List<Alarm> _alarms = const <Alarm>[];
   LandGeometry? _land;
+  RingingState? _ringing;
   bool _ready = false;
 
   @override
   void initState() {
     super.initState();
-    _ticker = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => _clock.value = DateTime.now(),
-    );
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
     _bootstrap();
   }
 
@@ -51,15 +49,36 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Future<void> _tick() async {
+    final now = DateTime.now();
+    _clock.value = now;
+    if (!_ready) return;
+    final ringing = await _native.current();
+    if (!mounted) return;
+    if (ringing?.alarmId == _ringing?.alarmId) return;
+    final previous = _ringing;
+    setState(() => _ringing = ringing);
+    if (previous != null && ringing == null) {
+      await _markAttended(previous.alarmId);
+    }
+  }
+
   Future<void> _bootstrap() async {
-    final timezoneId = await const DeviceTimezoneService().read();
-    await _scheduler.initialize(timezoneId);
+    await _permissions.initialize();
     final land = await LandGeometry.load();
 
     final hasData = await _repository.hasStoredAlarms();
-    final alarms = hasData ? await _repository.load() : _seedAlarms();
+    final stored = hasData ? await _repository.load() : _seedAlarms();
+    // Un uso ya vencido se dio por atendido mientras la app estaba cerrada.
+    final alarms = stored
+        .where(
+          (alarm) =>
+              alarm.isRepeating ||
+              AlarmCalculator.nextOccurrence(alarm, DateTime.now()) != null,
+        )
+        .toList();
     if (!hasData) await _repository.save(alarms);
-    await _scheduler.sync(alarms, DateTime.now());
+    await _native.sync(alarms, DateTime.now());
 
     if (!mounted) return;
     setState(() {
@@ -67,6 +86,7 @@ class _HomePageState extends State<HomePage> {
       _alarms = alarms;
       _ready = true;
     });
+    await _tick();
   }
 
   /// Dos ejemplos para que la pantalla tenga sentido la primera vez.
@@ -87,9 +107,26 @@ class _HomePageState extends State<HomePage> {
         ),
       ];
 
+  /// Al cortarse el sonido, la alarma de un uso se da por terminada.
+  Future<void> _markAttended(int alarmId) async {
+    final alarm = _alarms.where((a) => a.id == alarmId).firstOrNull;
+    if (alarm == null || alarm.isRepeating) return;
+    setState(() {
+      _alarms = _alarms.where((a) => a.id != alarmId).toList();
+    });
+    await _persist();
+  }
+
   Future<void> _persist() async {
     await _repository.save(_alarms);
-    await _scheduler.sync(_alarms, DateTime.now());
+    await _native.sync(_alarms, DateTime.now());
+  }
+
+  Future<void> _silence() async {
+    await _native.stop();
+    final ringing = _ringing;
+    setState(() => _ringing = null);
+    if (ringing != null) await _markAttended(ringing.alarmId);
   }
 
   Future<void> _addAlarm() async {
@@ -113,9 +150,7 @@ class _HomePageState extends State<HomePage> {
     );
     if (edited == null) return;
     setState(() {
-      _alarms = _alarms
-          .map((a) => a.id == edited.id ? edited : a)
-          .toList();
+      _alarms = _alarms.map((a) => a.id == edited.id ? edited : a).toList();
     });
     await _persist();
   }
@@ -164,6 +199,8 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, now, _) => WorldMapPanel(
                   land: _land,
                   now: now,
+                  ringing: _ringing,
+                  onSilence: _silence,
                 ),
               ),
             ),

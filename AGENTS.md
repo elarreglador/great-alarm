@@ -5,18 +5,21 @@ para alarmas y un tercio para el mapamundi día/noche con relojes GMT y local.
 
 ## Estructura (Package by Layer)
 
-- `lib/domain/` — entidades (`Alarm`, `GeoPoint`) y lógica pura
-  (`AlarmCalculator`, `SunTerminatorService`). Sin Flutter, sin E/S.
-- `lib/data/` — persistencia (`AlarmRepository`), programación nativa
-  (`AlarmNotificationScheduler`) y canal de zona horaria
-  (`DeviceTimezoneService`).
+- `lib/domain/` — entidades (`Alarm`, `GeoPoint`, `ToneOption`, `RingingState`)
+  y lógica pura (`AlarmCalculator`, `SunTerminatorService`). Sin Flutter, sin E/S.
+- `lib/data/` — persistencia (`AlarmRepository`), permisos
+  (`AlarmPermissionService`), programación nativa (`NativeAlarmScheduler`) y
+  zona horaria del dispositivo (en `MainActivity.kt`).
 - `lib/presentation/` — única pantalla (`HomePage`) y widgets por
   responsabilidad: `AlarmPanel`, `AlarmTile`, `AddAlarmSheet`, `WorldMapPanel`,
-  `WorldMapPainter`, `ClockStrip`.
+  `WorldMapPainter`, `DigitalClock`, `RingingPanel`.
 - `lib/utils/` — colores y formato de horas.
 - `assets/data/land.json` — contornos Natural Earth 110m (sin red).
-- `android/` — permisos, desugaring, receptores, sonido `raw/alarm.wav` y
-  `MainActivity.kt` (canal `eu.elarreglador.great_alarm/timezone`).
+- `android/` — `AlarmNativePlugin.kt` (MethodChannel), `AlarmReceiver`,
+  `AlarmRingingService` (MediaPlayer en bucle + notificación con «Silenciar»),
+  `BootReceiver`, `SilenceReceiver`, permisos y `raw/buzz_*.wav`. El canal
+  nativo es `eu.elarreglador.great_alarm/native`; el de zona horaria es
+  `eu.elarreglador.great_alarm/timezone`.
 
 ## Convenciones
 
@@ -25,6 +28,9 @@ para alarmas y un tercio para el mapamundi día/noche con relojes GMT y local.
 - La lógica de fechas va en `domain/services`, nunca en widgets.
 - La barra regresiva tiene 24 celdas de una hora: se apagan de derecha a
   izquierda; si falta más de un día, queda llena. Se vacía al sonar.
+- El sonido es pulsado (0,4 s / 0,4 s) en bucle, con seis frecuencias
+  (440–1600 Hz) y opción «Sin sonido» solo si la vibración está activa. El
+  servicio nativo corta a los 5 minutos; ese corte cuenta como alarma atendida.
 - No exponer secretos. `SENSIBLE/` queda ignorado por git.
 - No hacer commits ni pushes sin petición explícita.
 

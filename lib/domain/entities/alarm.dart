@@ -10,6 +10,9 @@ class Alarm {
   final Set<int> weekdays;
   final DateTime? date;
   final bool enabled;
+  /// Frecuencia del zumbido pulsado; null = alarma silenciosa.
+  final int? toneHz;
+  final bool vibrate;
 
   const Alarm({
     required this.id,
@@ -19,6 +22,8 @@ class Alarm {
     this.weekdays = const <int>{},
     this.date,
     this.enabled = true,
+    this.toneHz = 700,
+    this.vibrate = false,
   });
 
   bool get isRepeating => weekdays.isNotEmpty;
@@ -41,6 +46,8 @@ class Alarm {
     Set<int>? weekdays,
     DateTime? date,
     bool? enabled,
+    bool? vibrate,
+    bool clearTone = false,
   }) {
     return Alarm(
       id: id,
@@ -50,6 +57,8 @@ class Alarm {
       weekdays: weekdays ?? this.weekdays,
       date: date ?? this.date,
       enabled: enabled ?? this.enabled,
+      toneHz: clearTone ? null : toneHz,
+      vibrate: vibrate ?? this.vibrate,
     );
   }
 
@@ -61,6 +70,8 @@ class Alarm {
         'weekdays': weekdays.toList()..sort(),
         'date': date?.toIso8601String(),
         'enabled': enabled,
+        'toneHz': toneHz,
+        'vibrate': vibrate,
       };
 
   factory Alarm.fromJson(Map<String, dynamic> json) {
@@ -75,6 +86,8 @@ class Alarm {
           .toSet(),
       date: rawDate == null ? null : DateTime.parse(rawDate),
       enabled: json['enabled'] as bool? ?? true,
+      toneHz: json['toneHz'] as int? ?? 700,
+      vibrate: json['vibrate'] as bool? ?? false,
     );
   }
 }

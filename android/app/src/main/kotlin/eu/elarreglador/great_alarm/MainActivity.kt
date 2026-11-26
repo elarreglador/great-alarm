@@ -17,6 +17,7 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+        AlarmNativePlugin.register(flutterEngine, applicationContext)
     }
 
     private companion object {
