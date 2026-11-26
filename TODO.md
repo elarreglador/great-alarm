@@ -1,0 +1,36 @@
+# TODO
+
+Checklist del proyecto **Great Alarm**.
+
+## Features
+
+- [x] Pantalla fija en horizontal.
+- [x] Panel izquierdo (2/3) con listado de alarmas.
+- [x] Cada alarma muestra hora, días/fecha y cuenta atrás «sonará en …».
+- [x] Barra regresiva que se acorta hasta 0 (ventana de una semana).
+- [x] Botón flotante (+) para añadir alarmas.
+- [x] Alarmas de un solo uso y de repetición semanal.
+- [x] Activar/desactivar y borrar alarmas.
+- [x] Programación real en Android (AlarmManager) que suena con la app cerrada.
+- [x] Persistencia de las alarmas entre reinicios.
+- [x] Panel derecho (1/3) con mapamundi gris/azul oscuro y sombra negra día/noche.
+- [x] Relojes GMT y local con segundos bajo el mapa.
+- [x] README divulgativo sin menciones al stack.
+
+## Fix
+
+- [ ] Comprobar el sonido de la alarma en un dispositivo físico (no hay ninguno conectado ahora mismo).
+- [ ] Revisar el comportamiento de la barra en alarmas de un solo uso ya vencidas.
+- [ ] Verificar el terminador solar en un dispositivo real durante los equinoccios (|declinación| < 0.5°).
+
+## Tareas finalizadas
+
+- [x] README inicial y corrección del boceto para que horas, relojes y barras sean coherentes.
+- [x] `git init` del repositorio.
+- [x] Creación del proyecto Flutter con identificador `eu.elarreglador.great_alarm`.
+- [x] Reutilización del cálculo del terminador solar de `80-Dias-La-Herencia-de-Phoebe`.
+- [x] Asset vectorial de tierra firme (Natural Earth 110m) para el mapa sin red.
+- [x] Configuración Android: permisos, desugaring, receptores y sonido de alarma.
+- [x] Tests unitarios de `AlarmCalculator` y del terminador solar, y test de widget.
+- [x] `flutter analyze` sin incidencias, `flutter test` en verde.
+- [x] APK debug y release compilados correctamente.
