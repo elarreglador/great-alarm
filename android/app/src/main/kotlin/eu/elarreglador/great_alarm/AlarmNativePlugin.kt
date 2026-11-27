@@ -36,7 +36,10 @@ private const val MAX_RINGING_MS = 5 * 60 * 1000L
 private fun prefs(context: Context) =
     context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-private fun stopRinging(context: Context) {
+internal fun isRinging(context: Context): Boolean =
+    prefs(context).getString(KEY_RINGING, null) != null
+
+internal fun stopRinging(context: Context) {
     prefs(context).edit().remove(KEY_RINGING).apply()
     context.stopService(Intent(context, AlarmRingingService::class.java))
 }
@@ -71,6 +74,48 @@ private fun scheduleAll(context: Context) {
     }
 }
 
+/// Reproduce tres pulsos del tono elegido sin tocar el estado de la alarma.
+private fun previewTone(context: Context, hz: Int, vibrate: Boolean) {
+    val player = if (hz > 0) {
+        MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build(),
+            )
+            setDataSource(
+                context,
+                Uri.parse("android.resource://${context.packageName}/raw/buzz_$hz"),
+            )
+            prepare()
+            start()
+        }
+    } else {
+        null
+    }
+
+    val vibrator = if (vibrate) {
+        (context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator)?.also {
+            val pattern = longArrayOf(0, 400, 400, 400, 400, 400)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                it.vibrate(VibrationEffect.createWaveform(pattern, 0))
+            } else {
+                @Suppress("DEPRECATION")
+                it.vibrate(pattern, 0)
+            }
+        }
+    } else {
+        null
+    }
+
+    Handler(Looper.getMainLooper()).postDelayed({
+        player?.stop()
+        player?.release()
+        vibrator?.cancel()
+    }, 2400)
+}
+
 /// Puente MethodChannel y receptores del sistema para las alarmas nativas.
 class AlarmNativePlugin(private val context: Context) : MethodChannel.MethodCallHandler {
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -83,6 +128,13 @@ class AlarmNativePlugin(private val context: Context) : MethodChannel.MethodCall
                 }
                 prefs(context).edit().putString(KEY_SCHEDULE, json).apply()
                 scheduleAll(context)
+                result.success(null)
+            }
+            "previewTone" -> {
+                val args = call.arguments as? Map<*, *>
+                val hz = (args?.get("toneHz") as? Number)?.toInt() ?: 700
+                val vibrate = args?.get("vibrate") as? Boolean ?: false
+                previewTone(context, hz, vibrate)
                 result.success(null)
             }
             "isRinging" -> result.success(prefs(context).getString(KEY_RINGING, null))

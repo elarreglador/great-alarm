@@ -16,12 +16,15 @@ Checklist del proyecto **Great Alarm**.
 - [x] Panel derecho (1/3) con mapamundi gris/azul oscuro y sombra negra día/noche.
 - [x] Relojes GMT y local con segundos bajo el mapa.
 - [x] README divulgativo sin menciones al stack.
+- [x] Silenciar con cualquiera de los botones de volumen sin desbloquear el móvil.
+- [x] Panel derecho en carrusel cada 10 s: mapamundi y consejo de volumen.
 
 ## Fix
 
 - [ ] Comprobar el sonido de la alarma en un dispositivo físico (pendiente de programar una alarma a pocos segundos).
 - [ ] Revisar el comportamiento de la barra en alarmas de un solo uso ya vencidas.
 - [ ] Verificar el terminador solar en un dispositivo real durante los equinoccios (|declinación| < 0.5°).
+- [ ] Comprobar que MIUI entrega las teclas de volumen a `MainActivity` cuando salta la pantalla de alarma.
 
 ## Tareas finalizadas
 
@@ -55,5 +58,9 @@ Checklist del proyecto **Great Alarm**.
 - [x] Vibración opcional y alarma «Sin sonido» solo con vibración activa.
 - [x] Silenciado desde notificación, desde la app y desde la pantalla bloqueada.
 - [x] Corte automático a los 5 minutos que cuenta como alarma atendida.
+- [x] Botón «Probar tono» en el formulario de creación/edición.
 - [x] Resguardo a la derecha del reloj local para que no lo tape el botón (+).
 - [x] `AGENTS.md` documenta cómo lanzar la app por USB y los problemas de MIUI.
+- [x] `MainActivity` captura y consume el volumen mientras suena y llama a `stopRinging`.
+- [x] Retirados el detector de movimiento y el disparador por botón de power.
+- [x] Icono de la app con el tomate de `assets/tomate.jpeg` (iconos planos y adaptativos).

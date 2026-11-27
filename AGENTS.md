@@ -33,6 +33,9 @@ para alarmas y un tercio para el mapamundi día/noche con relojes GMT y local.
   servicio nativo corta a los 5 minutos; ese corte cuenta como alarma atendida.
 - No exponer secretos. `SENSIBLE/` queda ignorado por git.
 - No hacer commits ni pushes sin petición explícita.
+- El silenciado rápido se hace con los botones de volumen: `MainActivity` los captura
+  y los consume mientras suena, y llama a `stopRinging`. No se usan sensores ni el
+  botón de power.
 
 ## Verificación
 

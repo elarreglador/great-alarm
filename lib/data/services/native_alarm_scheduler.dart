@@ -50,5 +50,11 @@ class NativeAlarmScheduler {
     );
   }
 
+  /// Escucha tres pulsos del tono elegido desde el formulario.
+  Future<void> preview(int? toneHz, bool vibrate) => _channel.invokeMethod<void>(
+        'previewTone',
+        <String, dynamic>{'toneHz': toneHz ?? 0, 'vibrate': vibrate},
+      );
+
   Future<void> stop() => _channel.invokeMethod<void>('stopRinging');
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/services/native_alarm_scheduler.dart';
 import '../../domain/entities/alarm.dart';
 import '../../domain/entities/tone_option.dart';
 import '../../utils/app_colors.dart';
@@ -270,10 +271,32 @@ class _AddAlarmSheetState extends State<AddAlarmSheet> {
                 if (value == null) _vibrate = true;
               }),
             ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _save,
-              child: const Text('Guardar alarma'),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => const NativeAlarmScheduler().preview(
+                      _toneHz,
+                      _vibrate,
+                    ),
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Probar tono'),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.accent),
+                      foregroundColor: AppColors.accent,
+                      minimumSize: const Size.fromHeight(44),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _save,
+                    child: const Text('Guardar alarma'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

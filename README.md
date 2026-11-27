@@ -79,6 +79,8 @@ No hay que crear siete alarmas para los siete días de la semana. Se crea una, s
 
 Cada alarma lleva su propio zumbido: un pitido corto, una pausa, otro pitido, y así sin parar. Puede elegir entre seis tonos, de **440 a 1600 Hz**, con nombres como «Grave», «Media» o «Muy aguda». No hay que saber nada de frecuencias: basta con elegir la que más le agrade.
 
+En ese mismo formulario hay un botón **«Probar tono»**: suena tres pitidos con la frecuencia elegida —o vibra, si ha seleccionado «Sin sonido»— para que comprobe cómo queda antes de guardar.
+
 También puede marcar la casilla **Vibrar**. Si además quiere que el móvil no emita sonido, seleccione **«Sin sonido»** en el desplegable: la alarma vibrará y aparecerá en pantalla, pero no hará ruido. Esa opción solo se ofrece cuando la vibración está activada, para que no exista una alarma que no se perciba.
 
 Cuando la alarma suena, aparece un cartel bajo el mapa con el botón **Silenciar**. Ese mismo botón está en la notificación y, si el teléfono está bloqueado, en la propia pantalla de bloqueo. Si nadie lo pulsa, el zumbido se apaga solo a los **cinco minutos** y la alarma se da por atendida. Funciona incluso con el teléfono en silencio; eso sí, respeta el modo «No molestar» salvo que usted conceda el permiso para saltárselo.
